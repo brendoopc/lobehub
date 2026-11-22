@@ -5,9 +5,10 @@ permissions:
   issues: write
   actions: write
 
+# Agendamento removido de proposito: este fork tem commits proprios.
+# O sync automatico a cada 6h colidia com eles e falhava sempre,
+# gerando 4 notificacoes de falha por dia. Rode manualmente quando quiser.
 on:
-  schedule:
-    - cron: '0 */6 * * *' # every 6 hours
   workflow_dispatch:
 
 jobs:
@@ -24,7 +25,7 @@ jobs:
         uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
         with:
           upstream_sync_repo: lobehub/lobehub
-          upstream_sync_branch: main
-          target_sync_branch: main
-          target_repo_token: ${{ secrets.GITHUB_TOKEN }} # automatically generated, no need to set
+          upstream_sync_branch: canary
+          target_sync_branch: canary
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }} # automatico, nao precisa configurar
           test_mode: false
