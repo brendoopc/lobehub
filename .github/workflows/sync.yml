@@ -5,10 +5,12 @@ permissions:
   issues: write
   actions: write
 
-# Agendamento removido de proposito: este fork tem commits proprios.
-# O sync automatico a cada 6h colidia com eles e falhava sempre,
-# gerando 4 notificacoes de falha por dia. Rode manualmente quando quiser.
+# Fork tem commits proprios: o sync anterior (a cada 6h, em "main") falhava sempre.
+# Agora: duas vezes por mes (dias 1 e 16, ~a cada 15 dias), nas branches corretas.
+# Se o merge colidir com os commits proprios, o job falha e avisa por e-mail.
 on:
+  schedule:
+    - cron: '0 3 1,16 * *'
   workflow_dispatch:
 
 jobs:
