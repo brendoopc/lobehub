@@ -1,0 +1,40 @@
+name: Backup Neon
+
+on:
+  schedule:
+    - cron: '0 4 * * 0' # todo domingo, 04:00 UTC (01:00 em Brasilia)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    name: Dump do banco como artefato
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gerar dump (pg_dump 18, igual ao servidor)
+        env:
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DATABASE_URL:-}" ]; then
+            echo "::error::secret NEON_DATABASE_URL ausente"; exit 1
+          fi
+          mkdir -p out
+          docker run --rm -e PGURL="$DATABASE_URL" -v "$PWD/out:/out" postgres:18 \
+            bash -c 'pg_dump "$PGURL" --no-owner --no-acl --format=plain | gzip -9 > /out/neon-$(date -u +%Y%m%d).sql.gz'
+          F=$(ls out/*.sql.gz | head -1)
+          SZ=$(stat -c%s "$F")
+          echo "arquivo: $F ($SZ bytes)"
+          echo "tabelas: $(zcat "$F" | grep -c '^CREATE TABLE')"
+          if [ "$SZ" -lt 100000 ]; then
+            echo "::error::dump suspeito de incompleto ($SZ bytes)"; exit 1
+          fi
+
+      - name: Publicar como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: neon-backup-${{ github.run_number }}
+          path: out/*.sql.gz
+          retention-days: 90
