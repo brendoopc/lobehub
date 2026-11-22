@@ -95,7 +95,7 @@ export async function GET(
     isMobile,
   };
 
-  const template = await getTemplate(isMobile);
+  const template = await getTemplate(false);
   const seoMeta = await buildSeoMeta(locale, isMobile);
 
   return renderSpaHtml(template, { seoMeta, serverConfig: spaConfig });
