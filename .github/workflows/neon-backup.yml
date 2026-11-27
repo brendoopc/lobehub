@@ -1,8 +1,10 @@
 name: Backup Neon
 
+# Mensal (dia 1, 04:00 UTC = 01:00 Brasilia) + retencao de 90 dias.
+# Com rodagem mensal, 90 dias de retencao mantem exatamente os 3 ultimos backups.
 on:
   schedule:
-    - cron: '0 4 * * 0' # todo domingo, 04:00 UTC (01:00 em Brasilia)
+    - cron: '0 4 1 * *'
   workflow_dispatch:
 
 permissions:
